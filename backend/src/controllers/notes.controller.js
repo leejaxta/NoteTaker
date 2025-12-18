@@ -28,14 +28,37 @@ exports.createNote = async (req, res, next) => {
   }
 };
 
+// exports.updateNote = async (req, res, next) => {
+//   try {
+//     const note = await notesService.updateNote(
+//       req.user.id,
+//       req.params.id,
+//       req.body
+//     );
+//     success(res, note, "Note updated");
+//   } catch (err) {
+//     next(err);
+//   }
+// };
+
 exports.updateNote = async (req, res, next) => {
   try {
-    const note = await notesService.updateNote(
-      req.user.id,
-      req.params.id,
-      req.body
-    );
-    success(res, note, "Note updated");
+    const { title, content, categoryIds } = req.body;
+
+    const note = await notesService.updateNote(req.user.id, req.params.id, {
+      title,
+      content,
+    });
+
+    if (Array.isArray(categoryIds)) {
+      await notesService.updateNoteCategories(
+        req.user.id,
+        req.params.id,
+        categoryIds
+      );
+    }
+
+    success(res, note, "Note updated successfully");
   } catch (err) {
     next(err);
   }

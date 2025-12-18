@@ -84,6 +84,10 @@ exports.getNoteById = async (userId, noteId) => {
 };
 
 exports.updateNote = async (userId, noteId, { title, content }) => {
+  if (!title || !content) {
+    throw { status: 400, message: "Title and content are required" };
+  }
+
   const [result] = await pool.query(
     "UPDATE notes SET title = ?, content = ? WHERE id = ? AND user_id = ?",
     [title, content, noteId, userId]
@@ -94,6 +98,38 @@ exports.updateNote = async (userId, noteId, { title, content }) => {
   }
 
   return { id: noteId, title, content };
+};
+
+exports.updateNoteCategories = async (userId, noteId, categoryIds) => {
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+
+    const [notes] = await conn.query(
+      "SELECT id FROM notes WHERE id = ? AND user_id = ?",
+      [noteId, userId]
+    );
+
+    if (notes.length === 0) {
+      throw { status: 404, message: "Note not found" };
+    }
+
+    await conn.query("DELETE FROM note_categories WHERE note_id = ?", [noteId]);
+
+    for (const categoryId of categoryIds) {
+      await conn.query(
+        "INSERT INTO note_categories (note_id, category_id) VALUES (?, ?)",
+        [noteId, categoryId]
+      );
+    }
+
+    await conn.commit();
+  } catch (err) {
+    await conn.rollback();
+    throw err;
+  } finally {
+    conn.release();
+  }
 };
 
 exports.deleteNote = async (userId, noteId) => {
