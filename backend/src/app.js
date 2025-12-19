@@ -8,12 +8,14 @@ const authRoutes = require("./routes/auth.routes");
 const notesRoutes = require("./routes/notes.routes");
 const categoriesRoutes = require("./routes/categories.routes");
 const errorHandler = require("./middleware/error.middleware");
+const requestLogger = require("./middleware/requestLogger.middleware");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
+app.use(requestLogger);
 
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/api/auth", authRoutes);

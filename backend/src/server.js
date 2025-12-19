@@ -1,6 +1,7 @@
 const app = require("./app");
 const { port } = require("./config/env");
 const pool = require("./config/db");
+const logger = require("./utils/logger");
 
 app.get("/", async (req, res) => {
   try {
@@ -17,5 +18,5 @@ app.get("/", async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+  logger.info("Server running on port %d", port);
 });

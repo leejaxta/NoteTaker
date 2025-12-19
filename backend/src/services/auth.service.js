@@ -2,6 +2,7 @@ const { jwtSecret, jwtExpiresIn } = require("../config/env");
 const pool = require("../config/db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const logger = require("../utils/logger");
 
 exports.signup = async ({ name, email, password }) => {
   if (!name || !email || !password) {
@@ -25,6 +26,8 @@ exports.signup = async ({ name, email, password }) => {
     "INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)",
     [name, email, passwordHash]
   );
+
+  logger.info("New user registered: %s", email);
 
   return {
     id: result.insertId,

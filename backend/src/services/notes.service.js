@@ -1,4 +1,5 @@
 const pool = require("../config/db");
+const logger = require("../utils/logger");
 
 exports.createNote = async (userId, { title, content, categoryIds = [] }) => {
   if (!title || !content) {
@@ -25,6 +26,7 @@ exports.createNote = async (userId, { title, content, categoryIds = [] }) => {
     }
 
     await conn.commit();
+    logger.info("Note created | user=%d note=%d", userId, noteId);
     return { id: noteId, title, content };
   } catch (err) {
     await conn.rollback();
