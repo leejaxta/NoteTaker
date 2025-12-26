@@ -9,7 +9,6 @@ exports.signup = async ({ name, email, password }) => {
     throw { status: 400, message: "All fields are required" };
   }
 
-  // Check if user exists
   const [existing] = await pool.query("SELECT id FROM users WHERE email = ?", [
     email,
   ]);
@@ -18,10 +17,8 @@ exports.signup = async ({ name, email, password }) => {
     throw { status: 409, message: "Email already registered" };
   }
 
-  // Hash password
   const passwordHash = await bcrypt.hash(password, 10);
 
-  // Insert user
   const [result] = await pool.query(
     "INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)",
     [name, email, passwordHash]

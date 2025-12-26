@@ -17,7 +17,6 @@ exports.createNote = async (userId, { title, content, categoryIds = [] }) => {
 
     const noteId = result.insertId;
 
-    // Insert categories if provided
     for (const categoryId of categoryIds) {
       await conn.query(
         "INSERT INTO note_categories (note_id, category_id) VALUES (?, ?)",
@@ -37,40 +36,91 @@ exports.createNote = async (userId, { title, content, categoryIds = [] }) => {
 };
 
 exports.getNotes = async (userId, query) => {
-  const page = parseInt(query.page) || 1;
-  const limit = parseInt(query.limit) || 10;
+  const page = Math.max(parseInt(query.page) || 1, 1);
+  const limit = Math.min(parseInt(query.limit) || 10, 50);
   const offset = (page - 1) * limit;
-  const { categoryId, search, sort = "updated_at", order = "DESC" } = query;
 
-  let sql = `
-    SELECT DISTINCT n.*
-    FROM notes n
-    LEFT JOIN note_categories nc ON n.id = nc.note_id
-    WHERE n.user_id = ?
-  `;
+  const { categoryId, search } = query;
+
+  const allowedSortFields = ["created_at", "updated_at", "title"];
+  const sort = allowedSortFields.includes(query.sort)
+    ? query.sort
+    : "updated_at";
+
+  const order = query.order === "ASC" ? "ASC" : "DESC";
+
+  const whereClauses = [`n.user_id = ?`];
   const params = [userId];
 
   if (categoryId) {
-    sql += " AND nc.category_id = ?";
+    whereClauses.push(`nc.category_id = ?`);
     params.push(categoryId);
   }
 
   if (search) {
-    sql += " AND (n.title LIKE ? OR n.content LIKE ?)";
+    whereClauses.push(`(n.title LIKE ? OR n.content LIKE ?)`);
     params.push(`%${search}%`, `%${search}%`);
   }
 
-  sql += ` ORDER BY n.${sort} ${order} LIMIT ? OFFSET ?`;
-  params.push(limit, offset);
+  const whereSQL = whereClauses.join(" AND ");
 
-  const [rows] = await pool.query(sql, params);
 
+  const countSql = `
+    SELECT COUNT(DISTINCT n.id) AS total
+    FROM notes n
+    LEFT JOIN note_categories nc ON n.id = nc.note_id
+    WHERE ${whereSQL}
+  `;
+
+  const [[{ total }]] = await pool.query(countSql, params);
+
+
+  const dataSql = `
+    SELECT
+      n.id,
+      n.title,
+      n.content,
+      n.created_at,
+      n.updated_at,
+      GROUP_CONCAT(
+        DISTINCT JSON_OBJECT(
+          'id', c.id,
+          'name', c.name
+        )
+      ) AS categories
+    FROM notes n
+    LEFT JOIN note_categories nc ON n.id = nc.note_id
+    LEFT JOIN categories c ON c.id = nc.category_id
+    WHERE ${whereSQL}
+    GROUP BY n.id
+    ORDER BY n.${sort} ${order}
+    LIMIT ? OFFSET ?
+  `;
+
+  const dataParams = [...params, limit, offset];
+  const [rows] = await pool.query(dataSql, dataParams);
+
+
+  const data = rows.map(note => ({
+    ...note,
+    categories: note.categories
+      ? JSON.parse(`[${note.categories}]`)
+      : []
+  }));
+
+  const totalPages = Math.ceil(total / limit);
+
+ 
   return {
     page,
     limit,
-    data: rows,
+    total,
+    totalPages,
+    data
   };
 };
+
+
 
 exports.getNoteById = async (userId, noteId) => {
   const [rows] = await pool.query(
