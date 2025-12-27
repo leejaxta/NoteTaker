@@ -1,0 +1,146 @@
+.notes-page {
+  /* max-width: 900px; */
+  margin: auto;
+  padding-inline: 20px;
+}
+
+.notes-title {
+  margin-bottom: 16px;
+}
+
+.notes-filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.notes-filters > :first-child {
+  flex: 1; /* Input takes remaining width */
+}
+
+.filter-add {
+  flex-shrink: 0; /* Button keeps its natural size */
+}
+.category-select {
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  margin-right: 12px;
+}
+
+.add-note-button {
+  margin-bottom: 20px;
+}
+
+.filter-add{
+    align-content: end;
+}
+
+/* Grid layout for cards */
+.notes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+/* Empty notes */
+.empty-notes {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 40px 0;
+  color: #666;
+  font-size: 16px;
+  gap: 8px;
+}
+
+.empty-icon {
+  font-size: 48px;
+  color: #888;
+}
+
+
+.note-card {
+  position: relative;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  height: 220px;
+}
+
+.note-card:hover {
+  border-color: #121212;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transform: translateY(-1px);
+}
+
+.note-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.note-card-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.note-card-date {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  font-size: 12px;
+  color: #666;
+}
+
+.note-card-content {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* adjust number of lines to fit the new card height */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.note-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.note-card-tag {
+  font-size: 12px;
+  background-color: #e0e0e0;
+  color: #555;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.note-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.notes-layout {
+  display: flex;
+  min-height: calc(100vh - 60px);
+}
+
+.notes-content {
+  flex: 1;
+  /* padding: 16px; */
+}

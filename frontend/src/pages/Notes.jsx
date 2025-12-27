@@ -1,49 +1,38 @@
 import { useContext, useEffect, useState } from "react";
-import { createNote, deleteNote, getNotes, updateNote } from "../api/notes.api";
-import { createCategory, getCategories } from "../api/categories.api";
+import { useNavigate } from "react-router-dom";
+import { FiPlusSquare, FiTrash2 } from "react-icons/fi";
 import Input from "../components/common/Input";
-import Button from "../components/common/Button";
-import Modal from "../components/common/Modal";
-import CategorySelect from "../components/common/CategorySelect";
+import Pagination from "../components/common/Pagination";
 import { AuthContext } from "../context/AuthContext";
-import Pagination from "../components/common/pagination";
+import { deleteNote, getNotes } from "../api/notes.api";
+import { getCategories } from "../api/categories.api";
+import Navbar from "../components/common/Navbar";
+import { timeAgo } from "../utils/timeAgo";
+import "../styles/Notes.css";
+import Button from "../components/common/Button";
+import CategorySidebar from "../components/common/CategorySidebar";
 
 const Notes = () => {
   const { user, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const [notes, setNotes] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [newCategory, setNewCategory] = useState("");
-
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-
-  const [editNoteId, setEditNoteId] = useState(null);
-  const [editTitle, setEditTitle] = useState("");
-  const [editContent, setEditContent] = useState("");
-  const [editCategories, setEditCategories] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  const [limit] = useState(2);
+  const [limit] = useState(6);
   const [totalPages, setTotalPages] = useState(1);
 
-
-  const loadNotes = async ({ pageNumber = 1, categoryId = selectedCategory, searchText = search } = {}) => {
+  const loadNotes = async ({
+    pageNumber = 1,
+    categoryId = selectedCategory,
+    searchText = search,
+  } = {}) => {
     const [notesRes, categoriesRes] = await Promise.all([
-      getNotes({
-        page: pageNumber,
-        limit,
-        categoryId,
-        search: searchText,
-      }),
+      getNotes({ page: pageNumber, limit, categoryId, search: searchText }),
       getCategories(),
     ]);
-
-    console.log(notesRes.data.data);
 
     setNotes(notesRes.data.data.data);
     setPage(notesRes.data.data.page);
@@ -52,127 +41,122 @@ const Notes = () => {
   };
 
   useEffect(() => {
-    loadNotes({ pageNumber: 1 });
+    const fetchNotes = async () => {
+      try {
+        await loadNotes({ pageNumber: 1 });
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchNotes();
   }, [selectedCategory, search]);
 
-
-  const handleCreate = async () => {
-    if (!title || !content) return alert("Title and content required");
-
-    await createNote({
-      title,
-      content,
-      categoryIds: selectedCategories,
-    });
-
-    setTitle("");
-    setContent("");
-    setSelectedCategories([]);
-    loadNotes({ pageNumber: 1 });
-  };
-
-  const handleCreateCategory = async () => {
-    if (!newCategory.trim()) return;
-
-    await createCategory({ name: newCategory });
-    setNewCategory("");
-    loadNotes({}); 
-  };
-
   const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this note?")) return;
     await deleteNote(id);
-    loadNotes({});
+    loadNotes({ pageNumber: page });
   };
 
-  const openEditModal = (note) => {
-    setEditNoteId(note.id);
-    setEditTitle(note.title);
-    setEditContent(note.content);
-    setEditCategories((note.categories || []).map((c) => c.id));
-    setIsModalOpen(true);
+  const handlePageChange = (newPage) => {
+    loadNotes({ pageNumber: newPage });
   };
 
-  const handleUpdate = async () => {
-    if (!editTitle || !editContent) return alert("Title and content required");
-
-    await updateNote(editNoteId, {
-      title: editTitle,
-      content: editContent,
-      categoryIds: editCategories.filter(Boolean),
-    });
-
-    setIsModalOpen(false);
-    loadNotes({});
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
   };
-
 
   return (
-    <div style={{ maxWidth: 700, margin: "auto" }}>
-      <h2>My Notes</h2>
-      {user && <Button onClick={logout}>Logout</Button>}
+    <>
+      <Navbar user={user} handleLogout={handleLogout} />
+    <div className="notes-layout">
+  <CategorySidebar
+    categories={categories}
+    selectedCategory={selectedCategory}
+    onSelectCategory={(id) => setSelectedCategory(id)}
+    onAddCategory={() => {
+      console.log("Add category");
+    }}
+  />
+  <div className="notes-content">
 
-      <Input
-        label="Search notes"
-        placeholder="Search by title or content..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
+      <div className="notes-page">
+        <h2 className="notes-title">My Notes</h2>
 
-      <Input
-        label="New Category"
-        value={newCategory}
-        onChange={(e) => setNewCategory(e.target.value)}
-      />
-      <Button onClick={handleCreateCategory}>Add Category</Button>
+        <div className="notes-filters">
+          <Input
+            label="Search notes"
+            placeholder="Search by title or content..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
 
-      <Input label="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
-      <Input label="Content" value={content} onChange={(e) => setContent(e.target.value)} />
-      <CategorySelect
-        categories={categories}
-        selected={selectedCategories}
-        onChange={setSelectedCategories}
-      />
-      <Button onClick={handleCreate}>Add Note</Button>
-
-      <hr />
-
-      <select
-        value={selectedCategory}
-        onChange={(e) => setSelectedCategory(e.target.value)}
-      >
-        <option value="">All Categories</option>
-        {categories.map((c) => (
-          <option key={c.id} value={c.id}>
-            {c.name}
-          </option>
-        ))}
-      </select>
-
-      {notes.map((note) => (
-        <div key={note.id} style={{ marginBottom: "16px" }}>
-          <h4>{note.title}</h4>
-          <p>{note.content}</p>
-          <div>
-            {(note.categories || []).map((c) => (
-              <span key={c.id} style={{ marginRight: "6px", fontSize: "12px" }}>
-                #{c.name}
-              </span>
-            ))}
-          </div>
-          <Button onClick={() => openEditModal(note)}>Edit</Button>
-          <Button onClick={() => handleDelete(note.id)}>Delete</Button>
+          <div className="filter-add">
+         <Button
+          onClick={() => navigate("/notes/new")}
+          className="add-note-button"
+        >
+          Add Note
+        </Button>
         </div>
-      ))}
+        </div>
 
-      <Pagination page={page} totalPages={totalPages} onPageChange={(newPage) => loadNotes({ pageNumber: newPage })} />
 
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Edit Note">
-        <Input label="Title" value={editTitle} onChange={(e) => setEditTitle(e.target.value)} />
-        <Input label="Content" value={editContent} onChange={(e) => setEditContent(e.target.value)} />
-        <CategorySelect categories={categories} selected={editCategories} onChange={setEditCategories} />
-        <Button onClick={handleUpdate}>Save</Button>
-      </Modal>
+        {notes.length === 0 ? (
+          <div className="empty-notes">
+            <FiPlusSquare className="empty-icon" />
+            <p>Create your first note to get started!</p>
+          </div>
+        ) : (
+          <div className="notes-grid">
+            {notes.map((note) => {
+              const excerpt = note.content.replace(/<[^>]*>/g, "").substring(0, 150);
+
+              return (
+                <div
+                  key={note.id}
+                  className="note-card"
+                  onClick={() => navigate(`/notes/${note.id}`)}
+                >
+                  <div className="note-card-header">
+                    <h3 className="note-card-title">{note.title || "Untitled"}</h3>
+                             <div
+                    className="note-card-delete"
+                    onClick={(e) => {
+                      e.stopPropagation(); 
+                      handleDelete(note.id);
+                    }}
+                  >
+                    <FiTrash2 />
+                  </div>
+                  </div>
+                  <p className="note-card-content">{excerpt}</p>
+                  {note.categories?.length > 0 && (
+                    <div className="note-card-tags">
+                      {note.categories.map((c) => (
+                        <span key={c.id} className="note-card-tag">
+                          {c.name}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+         
+                  <span className="note-card-date">{timeAgo(note.updated_at)}</span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
+      </div>
     </div>
+    </div>
+    </>
   );
 };
 

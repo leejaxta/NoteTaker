@@ -54,7 +54,7 @@ exports.login = async ({ email, password }) => {
     throw { status: 401, message: "Invalid email or password" };
   }
 
-  const token = jwt.sign({ id: user.id, email: user.email }, jwtSecret, {
+  const token = jwt.sign({ id: user.id, email: user.email, name: user.name }, jwtSecret, {
     expiresIn: jwtExpiresIn,
   });
 

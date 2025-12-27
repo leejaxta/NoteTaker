@@ -1,0 +1,64 @@
+/* Navbar wrapper */
+.navbar {
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+}
+
+/* Container inside navbar */
+.navbar-container {
+  margin: 0 auto;
+  padding: 0 16px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Left section: logo + title */
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.navbar-icon {
+  height: 24px;
+  width: 24px;
+  color: #2563eb; /* primary color */
+}
+
+.navbar-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+}
+
+/* Right section: username + logout button */
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.navbar-username {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* Logout icon */
+.logout-icon {
+  height: 16px;
+  width: 16px;
+  cursor: pointer;
+}
+
+.sidebar-toggle {
+  font-size: 22px;
+  cursor: pointer;
+  margin-right: 12px;
+  color: #444;
+}
+
+.sidebar-toggle:hover {
+  color: #000;
+}

@@ -1,10 +1,13 @@
 const pool = require("../config/db");
 const logger = require("../utils/logger");
+const sanitizeContent = require("../utils/sanitize");
 
 exports.createNote = async (userId, { title, content, categoryIds = [] }) => {
   if (!title || !content) {
     throw { status: 400, message: "Title and content are required" };
   }
+
+  const safeContent = sanitizeContent(content);
 
   const conn = await pool.getConnection();
   try {
@@ -12,7 +15,7 @@ exports.createNote = async (userId, { title, content, categoryIds = [] }) => {
 
     const [result] = await conn.query(
       "INSERT INTO notes (user_id, title, content) VALUES (?, ?, ?)",
-      [userId, title, content]
+      [userId, title, safeContent]
     );
 
     const noteId = result.insertId;
@@ -26,7 +29,7 @@ exports.createNote = async (userId, { title, content, categoryIds = [] }) => {
 
     await conn.commit();
     logger.info("Note created | user=%d note=%d", userId, noteId);
-    return { id: noteId, title, content };
+    return { id: noteId, title, content: safeContent };
   } catch (err) {
     await conn.rollback();
     throw err;
@@ -64,7 +67,6 @@ exports.getNotes = async (userId, query) => {
 
   const whereSQL = whereClauses.join(" AND ");
 
-
   const countSql = `
     SELECT COUNT(DISTINCT n.id) AS total
     FROM notes n
@@ -74,8 +76,63 @@ exports.getNotes = async (userId, query) => {
 
   const [[{ total }]] = await pool.query(countSql, params);
 
-
   const dataSql = `
+    SELECT
+      n.id,
+      n.title,
+      n.content,
+      n.created_at,
+      n.updated_at,
+      GROUP_CONCAT(
+        DISTINCT
+        IF(
+          c.id IS NOT NULL,
+          JSON_OBJECT(
+            'id', c.id,
+            'name', c.name
+          ),
+          NULL
+        )
+      ) AS categories
+    FROM notes n
+    LEFT JOIN note_categories nc ON n.id = nc.note_id
+    LEFT JOIN categories c ON c.id = nc.category_id
+    WHERE ${whereSQL}
+    GROUP BY n.id
+    ORDER BY n.${sort} ${order}
+    LIMIT ? OFFSET ?
+  `;
+
+  const dataParams = [...params, limit, offset];
+  const [rows] = await pool.query(dataSql, dataParams);
+
+  const data = rows.map(note => ({
+    id: note.id,
+    title: note.title,
+    content: note.content,
+    created_at: note.created_at,
+    updated_at: note.updated_at,
+    categories: note.categories
+      ? JSON.parse(`[${note.categories}]`).filter(c => c.id !== null)
+      : []
+  }));
+
+  const totalPages = Math.ceil(total / limit);
+
+  return {
+    page,
+    limit,
+    total,
+    totalPages,
+    data
+  };
+};
+
+
+
+
+exports.getNoteById = async (userId, noteId) => {
+  const sql = `
     SELECT
       n.id,
       n.title,
@@ -91,65 +148,44 @@ exports.getNotes = async (userId, query) => {
     FROM notes n
     LEFT JOIN note_categories nc ON n.id = nc.note_id
     LEFT JOIN categories c ON c.id = nc.category_id
-    WHERE ${whereSQL}
+    WHERE n.id = ? AND n.user_id = ?
     GROUP BY n.id
-    ORDER BY n.${sort} ${order}
-    LIMIT ? OFFSET ?
   `;
 
-  const dataParams = [...params, limit, offset];
-  const [rows] = await pool.query(dataSql, dataParams);
-
-
-  const data = rows.map(note => ({
-    ...note,
-    categories: note.categories
-      ? JSON.parse(`[${note.categories}]`)
-      : []
-  }));
-
-  const totalPages = Math.ceil(total / limit);
-
- 
-  return {
-    page,
-    limit,
-    total,
-    totalPages,
-    data
-  };
-};
-
-
-
-exports.getNoteById = async (userId, noteId) => {
-  const [rows] = await pool.query(
-    "SELECT * FROM notes WHERE id = ? AND user_id = ?",
-    [noteId, userId]
-  );
+  const [rows] = await pool.query(sql, [noteId, userId]);
 
   if (rows.length === 0) {
     throw { status: 404, message: "Note not found" };
   }
 
-  return rows[0];
+  const note = rows[0];
+
+  return {
+    ...note,
+    categories: note.categories
+      ? JSON.parse(`[${note.categories}]`)
+      : []
+  };
 };
+
 
 exports.updateNote = async (userId, noteId, { title, content }) => {
   if (!title || !content) {
     throw { status: 400, message: "Title and content are required" };
   }
 
+  const safeContent = sanitizeContent(content);
+
   const [result] = await pool.query(
     "UPDATE notes SET title = ?, content = ? WHERE id = ? AND user_id = ?",
-    [title, content, noteId, userId]
+    [title, safeContent, noteId, userId]
   );
 
   if (result.affectedRows === 0) {
     throw { status: 404, message: "Note not found or unauthorized" };
   }
 
-  return { id: noteId, title, content };
+  return { id: noteId, title, content: safeContent };
 };
 
 exports.updateNoteCategories = async (userId, noteId, categoryIds) => {

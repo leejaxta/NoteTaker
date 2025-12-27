@@ -14,7 +14,8 @@ const App = () => (
 
       <Route element={<ProtectedRoute />}>
         <Route path="/" element={<Notes />} />
-        <Route path="/notes/:id" element={<NoteDetails />} />
+           <Route path="/notes/new" element={<NoteDetails />} />
+    <Route path="/notes/:noteId" element={<NoteDetails />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />

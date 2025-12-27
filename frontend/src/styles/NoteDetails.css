@@ -1,0 +1,29 @@
+.note-details-container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+}
+
+.note-details-title {
+  margin-bottom: 16px;
+}
+
+.note-details-editor {
+    min-height: 60vh;
+  margin-block: 16px;
+}
+
+.note-details-actions {
+  margin-top: 24px;
+  display: flex;
+  gap: 12px;
+}
+
+.category-manager{
+    margin-top: 20px;
+}
+
+.cancel-button {
+  background-color: #ccc;
+  color: #000;
+}

@@ -1,53 +1,125 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { signupApi } from "../api/auth.api";
 import Input from "../components/common/Input";
 import Button from "../components/common/Button";
+import "../styles/Signup.css"; 
 
 const Signup = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+
+  const validate = () => {
+    const errors = {};
+
+    if (!name.trim()) errors.name = "Name is required";
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.trim()) errors.email = "Email is required";
+    else if (!emailRegex.test(email)) errors.email = "Invalid email address";
+
+    if (!password) errors.password = "Password is required";
+    else if (password.length < 6)
+      errors.password = "Password must be at least 6 characters";
+
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    if (!validate()) return;
 
+    setIsLoading(true);
     try {
       await signupApi({ name, email, password });
       navigate("/login");
     } catch (err) {
       setError(err.response?.data?.message || "Signup failed");
     }
+    setIsLoading(false);
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ maxWidth: 400, margin: "auto" }}>
-      <h2>Signup</h2>
+    <div className="signup-page">
+      <div className="signup-container">
+        {/* Header */}
+        <div className="signup-header">
+          <div className="login-logo"> 
+            <img src="note_taker.png" alt="Logo" className="app-logo" />
+            <h1 className="app-title">Notes</h1>
+          </div>
+          <p className="app-subtitle">Create your account to get started</p>
+        </div>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+        {/* Card */}
+        <div className="signup-card">
+          <div className="card-header">
+            <h2 className="card-title">Create account</h2>
+            <p className="card-subtitle">
+              Enter your information to create your account
+            </p>
+          </div>
 
-      <Input
-        label="Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
-      <Input
-        label="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <Input
-        label="Password"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
+          <form onSubmit={handleSubmit} className="signup-form">
+            <Input
+              label="Full name"
+              type="text"
+              placeholder="John Doe"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+            {fieldErrors.name && (
+              <div className="field-error">{fieldErrors.name}</div>
+            )}
 
-      <Button type="submit">Signup</Button>
-    </form>
+            <Input
+              label="Email"
+              type="email"
+              placeholder="your@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            {fieldErrors.email && (
+              <div className="field-error">{fieldErrors.email}</div>
+            )}
+
+            <Input
+              label="Password"
+              type="password"
+              placeholder="Create a password (min. 6 characters)"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            {fieldErrors.password && (
+              <div className="field-error">{fieldErrors.password}</div>
+            )}
+
+            {error && <div className="error-message">{error}</div>}
+
+            <Button type="submit" className="signup-button" disabled={isLoading}>
+              {isLoading ? "Creating account..." : "Create account"}
+            </Button>
+          </form>
+
+          <div className="card-footer">
+            <span className="signup-text">Already have an account? </span>
+            <Link to="/login" className="signup-link">
+              Sign in
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
