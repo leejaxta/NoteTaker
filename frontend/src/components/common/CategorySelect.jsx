@@ -9,10 +9,19 @@ const CategorySelect = ({ categories, selected, onChange }) => {
 
   return (
     <div style={{ marginBottom: "16px" }}>
-      <label style={{ fontWeight: "500", marginBottom: "6px", display: "block" }}>
+      <label
+        style={{ fontWeight: "500", marginBottom: "6px", display: "block" }}
+      >
         Categories
       </label>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "6px" }}>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "8px",
+          marginTop: "6px",
+        }}
+      >
         {categories.map((cat) => {
           const isSelected = selected.includes(cat.id);
           return (

@@ -2,10 +2,16 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import TextAlign from "@tiptap/extension-text-align";
 import { useEffect, useState } from "react";
-import { 
-  AiOutlineBold, AiOutlineItalic, AiOutlineUnderline, AiOutlineStrikethrough, 
-  AiOutlineUnorderedList, AiOutlineOrderedList, 
-  AiOutlineAlignLeft, AiOutlineAlignCenter, AiOutlineAlignRight
+import {
+  AiOutlineBold,
+  AiOutlineItalic,
+  AiOutlineUnderline,
+  AiOutlineStrikethrough,
+  AiOutlineUnorderedList,
+  AiOutlineOrderedList,
+  AiOutlineAlignLeft,
+  AiOutlineAlignCenter,
+  AiOutlineAlignRight,
 } from "react-icons/ai";
 import "../../styles/RichTextEditor.css";
 
@@ -20,7 +26,7 @@ const RichTextEditor = ({ content, setContent }) => {
     ],
     content: content || "",
     onUpdate: ({ editor }) => setContent(editor.getHTML()),
-    onSelectionUpdate: () => setUpdate(u => u + 1),
+    onSelectionUpdate: () => setUpdate((u) => u + 1),
     editorProps: { attributes: { class: "rich-text-editor" } },
   });
 
@@ -49,7 +55,7 @@ const RichTextEditor = ({ content, setContent }) => {
           onMouseDown={(e) => {
             e.preventDefault();
             editor.chain().focus().toggleBold().run();
-            setUpdate(u => u + 1);
+            setUpdate((u) => u + 1);
           }}
           title="Bold"
         >
@@ -61,7 +67,7 @@ const RichTextEditor = ({ content, setContent }) => {
           onMouseDown={(e) => {
             e.preventDefault();
             editor.chain().focus().toggleItalic().run();
-            setUpdate(u => u + 1);
+            setUpdate((u) => u + 1);
           }}
           title="Italic"
         >
@@ -73,7 +79,7 @@ const RichTextEditor = ({ content, setContent }) => {
           onMouseDown={(e) => {
             e.preventDefault();
             editor.chain().focus().toggleUnderline().run();
-            setUpdate(u => u + 1);
+            setUpdate((u) => u + 1);
           }}
           title="Underline"
         >
@@ -85,7 +91,7 @@ const RichTextEditor = ({ content, setContent }) => {
           onMouseDown={(e) => {
             e.preventDefault();
             editor.chain().focus().toggleStrike().run();
-            setUpdate(u => u + 1);
+            setUpdate((u) => u + 1);
           }}
           title="Strikethrough"
         >
@@ -100,7 +106,7 @@ const RichTextEditor = ({ content, setContent }) => {
           onMouseDown={(e) => {
             e.preventDefault();
             editor.chain().focus().toggleBulletList().run();
-            setUpdate(u => u + 1);
+            setUpdate((u) => u + 1);
           }}
           title="Bullet List"
         >
@@ -112,13 +118,13 @@ const RichTextEditor = ({ content, setContent }) => {
           onMouseDown={(e) => {
             e.preventDefault();
             editor.chain().focus().toggleOrderedList().run();
-            setUpdate(u => u + 1);
+            setUpdate((u) => u + 1);
           }}
           title="Numbered List"
         >
           <AiOutlineOrderedList />
         </button>
-        
+
         <div className="toolbar-separator" />
 
         <button

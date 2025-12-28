@@ -28,19 +28,6 @@ exports.createNote = async (req, res, next) => {
   }
 };
 
-// exports.updateNote = async (req, res, next) => {
-//   try {
-//     const note = await notesService.updateNote(
-//       req.user.id,
-//       req.params.id,
-//       req.body
-//     );
-//     success(res, note, "Note updated");
-//   } catch (err) {
-//     next(err);
-//   }
-// };
-
 exports.updateNote = async (req, res, next) => {
   try {
     const { title, content, categoryIds } = req.body;

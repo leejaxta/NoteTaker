@@ -1,5 +1,6 @@
 import { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 import Button from "../components/common/Button";
 import Input from "../components/common/Input";
 import { AuthContext } from "../context/AuthContext";
@@ -8,6 +9,7 @@ import "../styles/Login.css";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState({});
   const { login } = useContext(AuthContext);
@@ -15,15 +17,12 @@ const Login = () => {
 
   const validate = () => {
     const errors = {};
-
     if (!email.trim()) errors.email = "Email is required";
     else {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) errors.email = "Invalid email address";
     }
-
     if (!password) errors.password = "Password is required";
-
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -31,7 +30,6 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-
     if (!validate()) return;
 
     try {
@@ -46,7 +44,7 @@ const Login = () => {
     <div className="login-page">
       <div className="login-container">
         <div className="login-header">
-          <div className="login-logo"> 
+          <div className="login-logo">
             <img src="note_taker.png" alt="Logo" className="app-logo" />
             <h1 className="app-title">Notes</h1>
           </div>
@@ -72,14 +70,22 @@ const Login = () => {
               <div className="field-error">{fieldErrors.email}</div>
             )}
 
-            <Input
-              label="Password"
-              type="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <div className="password-input-wrapper">
+              <Input
+                label="Password"
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <span
+                className="password-toggle-icon"
+                onClick={() => setShowPassword((prev) => !prev)}
+              >
+                {showPassword ? <FiEyeOff /> : <FiEye />}
+              </span>
+            </div>
             {fieldErrors.password && (
               <div className="field-error">{fieldErrors.password}</div>
             )}

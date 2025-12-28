@@ -1,0 +1,109 @@
+.category-manager {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.selected-categories {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.selected-category {
+  display: flex;
+  align-items: center;
+  background: #e0e0e0;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+.selected-category-remove {
+  margin-left: 6px;
+  cursor: pointer;
+}
+
+.add-manage-btn {
+  display: flex;
+  align-items: center;
+}
+
+.add-manage-btn .icon {
+  margin-right: 4px;
+}
+
+.new-category-form {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.search-input {
+  margin-bottom: 12px;
+}
+
+.categories-list {
+  padding: 5px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.category-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.edit-category-form {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+}
+
+.category-name {
+  cursor: pointer;
+}
+
+.category-actions {
+  display: flex;
+  gap: 8px;
+  color: #555;
+}
+
+.category-actions svg {
+  cursor: pointer;
+}
+
+.category-actions svg:hover {
+  color: #000;
+}
+
+.category-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding-block: 10px;
+  color: #555;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.category-label-icon {
+  font-size: 14px;
+  color: #777;
+}
+
+.selected-icon {
+  margin-left: 6px;
+  color: #121212;
+  vertical-align: middle;
+}
+
+.add-button {
+  display: flex;
+  align-items: end;
+  gap: 8px;
+}

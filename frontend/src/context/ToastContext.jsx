@@ -1,14 +1,13 @@
 import { createContext, useState, useContext, useCallback } from "react";
 import Toast from "../components/common/Toast";
 
-
 const ToastContext = createContext();
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const useToast = () => useContext(ToastContext);
 
 export const ToastProvider = ({ children }) => {
-  const [toast, setToast] = useState(null); 
+  const [toast, setToast] = useState(null);
 
   const showToast = useCallback((message, type = "error") => {
     setToast({ message, type });

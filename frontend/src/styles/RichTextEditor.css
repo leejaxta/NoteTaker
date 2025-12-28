@@ -2,7 +2,7 @@
   border: 1px solid #ccc;
   border-radius: 8px;
   overflow: hidden;
-  background-color: #fff; /* card background */
+  background-color: #fff;
 }
 
 .rich-text-toolbar {
@@ -35,7 +35,7 @@
 }
 
 .rich-text-toolbar button.active {
-  background-color: #e0e0e0; /* active button background */
+  background-color: #e0e0e0;
 }
 
 .rich-text-editor {

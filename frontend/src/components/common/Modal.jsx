@@ -10,7 +10,7 @@ const Modal = ({ isOpen, onClose, children, title }) => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        zIndex: 1000,
+        zIndex: 1002,
         animation: "fadeIn 0.2s ease",
       }}
     >
@@ -27,7 +27,13 @@ const Modal = ({ isOpen, onClose, children, title }) => {
         }}
       >
         {title && (
-          <h3 style={{ marginBottom: "16px", fontSize: "20px", fontWeight: "600" }}>
+          <h3
+            style={{
+              marginBottom: "16px",
+              fontSize: "20px",
+              fontWeight: "600",
+            }}
+          >
             {title}
           </h3>
         )}

@@ -3,9 +3,62 @@ const { success } = require("../utils/apiResponse");
 const logger = require("../utils/logger");
 
 exports.signup = async (req, res, next) => {
+  const { name, email, password } = req.body;
   try {
-    const user = await authService.signup(req.body);
-    success(res, user, "User registered successfully");
+    const { otpToken, signupToken } = await authService.signupWithOtp({
+      name,
+      email,
+      password,
+    });
+
+    res.cookie("otpToken", otpToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "strict",
+      maxAge: 10 * 60 * 1000,
+    });
+
+    res.cookie("signupToken", signupToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "strict",
+      maxAge: 15 * 60 * 1000,
+    });
+    success(res, "OTP sent to email");
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.resendOtp = async (req, res, next) => {
+  const signupToken = req.cookies?.signupToken;
+  try {
+    const { otpToken } = await authService.resendOtp({ signupToken });
+    res.cookie("otpToken", otpToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "strict",
+      maxAge: 10 * 60 * 1000,
+    });
+    success(res, "OTP sent to email");
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.verifyOtp = async (req, res, next) => {
+  const { otp } = req.body;
+  const otpToken = req.cookies?.otpToken;
+  const signupToken = req.cookies?.signupToken;
+  try {
+    const user = await authService.verifyOtpAndRegister({
+      otp,
+      otpToken,
+      signupToken,
+    });
+    res.clearCookie("otpToken");
+    res.clearCookie("signupToken");
+    success(res, user, "Email verified and user registered successfully");
   } catch (err) {
     next(err);
   }
@@ -16,9 +69,9 @@ exports.login = async (req, res, next) => {
     const token = await authService.login(req.body);
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false, 
-      sameSite: "strict", 
-      maxAge: 3600000, 
+      secure: false,
+      sameSite: "strict",
+      maxAge: 3600000,
     });
     success(res, { token }, "Login successful");
   } catch (err) {
@@ -35,7 +88,7 @@ exports.logout = (req, res) => {
   });
 
   logger.info(`User logged out: ${req.user?.id || "unknown"}`);
-  res.status(200).json({ message: "Logged out successfully" });
+  success(res, "Logged out successfully");
 };
 
 exports.me = async (req, res) => {

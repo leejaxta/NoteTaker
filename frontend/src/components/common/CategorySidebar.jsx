@@ -6,9 +6,10 @@ const CategorySidebar = ({
   selectedCategory,
   onSelectCategory,
   onAddCategory,
+  isOpen,
 }) => {
   return (
-    <aside className="category-sidebar">
+    <aside className={`category-sidebar ${isOpen ? "open" : ""}`}>
       <div className="category-sidebar-header">
         <h4>Categories</h4>
         <button
@@ -37,7 +38,6 @@ const CategorySidebar = ({
             onClick={() => onSelectCategory(String(c.id))}
           >
             <span className="category-name">{c.name}</span>
-            {/* <span className="category-count">{c.noteCount ?? 0}</span> */}
           </div>
         ))}
       </div>

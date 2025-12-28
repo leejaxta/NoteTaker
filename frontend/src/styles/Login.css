@@ -1,27 +1,25 @@
-/* Page background & center */
 .login-page {
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: #f9fafb;
+  padding: 16px;
 }
 
-/* Container */
 .login-container {
   width: 100%;
   max-width: 400px;
 }
 
-/* Header */
 .login-header {
   text-align: center;
   margin-bottom: 32px;
 }
 
-.login-logo{
-    display: flex;
-    justify-content: center;
+.login-logo {
+  display: flex;
+  justify-content: center;
 }
 
 .app-title {
@@ -31,9 +29,9 @@
   color: #111827;
 }
 
-.app-logo{
-    width: 30px;
-    height: 40px;
+.app-logo {
+  width: 30px;
+  height: 40px;
 }
 
 .app-subtitle {
@@ -42,7 +40,6 @@
   margin-top: 4px;
 }
 
-/* Card */
 .login-card {
   background-color: #ffffff;
   border: 1px solid #e5e7eb;
@@ -51,7 +48,6 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* Card Header */
 .card-header {
   margin-bottom: 24px;
 }
@@ -68,14 +64,12 @@
   margin-top: 4px;
 }
 
-/* Form */
 .login-form {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-/* Error */
 .error-message {
   font-size: 14px;
   color: #b91c1c;
@@ -84,21 +78,19 @@
   border-radius: 6px;
 }
 
-/* Button */
 .login-button {
   width: 100%;
   height: 40px;
   font-weight: 500;
 }
 
-/* Footer */
 .card-footer {
   margin-top: 16px;
   text-align: center;
   font-size: 14px;
 }
 
-.signup-text{
+.signup-text {
   font-size: 14px;
   color: #6b7280;
 }
@@ -117,4 +109,21 @@
   font-size: 13px;
   color: #b91c1c;
   margin-top: 4px;
+}
+
+.password-input-wrapper {
+  position: relative;
+}
+
+.password-toggle-icon {
+  position: absolute;
+  top: 75%;
+  right: 12px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #888;
+}
+
+.password-toggle-icon:hover {
+  color: #333;
 }

@@ -3,12 +3,14 @@ import { useNavigate, Link } from "react-router-dom";
 import { signupApi } from "../api/auth.api";
 import Input from "../components/common/Input";
 import Button from "../components/common/Button";
-import "../styles/Signup.css"; 
+import { FiEye, FiEyeOff } from "react-icons/fi";
+import "../styles/Signup.css";
 
 const Signup = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
@@ -39,7 +41,7 @@ const Signup = () => {
     setIsLoading(true);
     try {
       await signupApi({ name, email, password });
-      navigate("/login");
+      navigate("/verify-otp");
     } catch (err) {
       setError(err.response?.data?.message || "Signup failed");
     }
@@ -51,7 +53,7 @@ const Signup = () => {
       <div className="signup-container">
         {/* Header */}
         <div className="signup-header">
-          <div className="login-logo"> 
+          <div className="login-logo">
             <img src="note_taker.png" alt="Logo" className="app-logo" />
             <h1 className="app-title">Notes</h1>
           </div>
@@ -71,7 +73,7 @@ const Signup = () => {
             <Input
               label="Full name"
               type="text"
-              placeholder="John Doe"
+              placeholder="Full Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
@@ -92,21 +94,34 @@ const Signup = () => {
               <div className="field-error">{fieldErrors.email}</div>
             )}
 
-            <Input
-              label="Password"
-              type="password"
-              placeholder="Create a password (min. 6 characters)"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <div className="password-input-wrapper">
+              <Input
+                label="Password"
+                type={showPassword ? "text" : "password"}
+                placeholder="Create a password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <span
+                className="password-toggle-icon"
+                onClick={() => setShowPassword((prev) => !prev)}
+              >
+                {showPassword ? <FiEyeOff /> : <FiEye />}
+              </span>
+            </div>
+
             {fieldErrors.password && (
               <div className="field-error">{fieldErrors.password}</div>
             )}
 
             {error && <div className="error-message">{error}</div>}
 
-            <Button type="submit" className="signup-button" disabled={isLoading}>
+            <Button
+              type="submit"
+              className="signup-button"
+              disabled={isLoading}
+            >
               {isLoading ? "Creating account..." : "Create account"}
             </Button>
           </form>

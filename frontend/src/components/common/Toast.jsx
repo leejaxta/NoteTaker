@@ -9,7 +9,7 @@ const Toast = ({ message, type = "error", duration = 3000, onClose }) => {
     return () => clearTimeout(timer);
   }, [duration, onClose]);
 
-  const bgColor = type === "error" ? "#f56565" : "#48bb78"; 
+  const bgColor = type === "error" ? "#f56565" : "#48bb78";
 
   return (
     <div

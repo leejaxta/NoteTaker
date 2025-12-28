@@ -14,7 +14,7 @@ const auth = require("../middleware/auth.middleware");
  * @swagger
  * /auth/signup:
  *   post:
- *     summary: Register a new user
+ *     summary: Send Otp to email
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -32,11 +32,98 @@ const auth = require("../middleware/auth.middleware");
  *                 type: string
  *     responses:
  *       201:
- *         description: User registered successfully
+ *         description: OTP sent to emai
  *       409:
  *         description: Email already exists
  */
 router.post("/signup", authController.signup);
+
+/**
+ * @swagger
+ * /auth/verify-otp:
+ *   post:
+ *     summary: Verify OTP and register user
+ *     description: |
+ *       Verifies the OTP sent to the user's email using tokens stored in cookies.
+ *       If verification succeeds, the user is registered.
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [otp]
+ *             properties:
+ *               otp:
+ *                 type: string
+ *                 example: "123456"
+ *     parameters:
+ *       - in: cookie
+ *         name: otpToken
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: JWT containing OTP and email
+ *       - in: cookie
+ *         name: signupToken
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: JWT containing signup details (name, email, password)
+ *     responses:
+ *       200:
+ *         description: Email verified and user registered successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                     name:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *       400:
+ *         description: Invalid or expired OTP, or token mismatch
+ *       500:
+ *         description: Internal server error
+ */
+router.post("/verify-otp", authController.verifyOtp);
+
+/**
+ * @swagger
+ * /auth/resend-otp:
+ *   post:
+ *     summary: Resend OTP to email
+ *     description: |
+ *       Resends a new OTP to the user's email using the signup session stored in cookies.
+ *       Generates a new OTP token and sets it as an HTTP-only cookie.
+ *     tags: [Auth]
+ *     parameters:
+ *       - in: cookie
+ *         name: signupToken
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: JWT containing signup session information
+ *     responses:
+ *       200:
+ *         description: OTP sent to email
+ *       401:
+ *         description: Signup session expired or invalid
+ *       500:
+ *         description: Internal server error
+ */
+router.post("/resend-otp", authController.resendOtp);
 
 /**
  * @swagger

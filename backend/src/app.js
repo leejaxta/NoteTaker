@@ -14,10 +14,11 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: true, //dev mode
     credentials: true,
   })
 );
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(requestLogger);

@@ -106,15 +106,15 @@ exports.getNotes = async (userId, query) => {
   const dataParams = [...params, limit, offset];
   const [rows] = await pool.query(dataSql, dataParams);
 
-  const data = rows.map(note => ({
+  const data = rows.map((note) => ({
     id: note.id,
     title: note.title,
     content: note.content,
     created_at: note.created_at,
     updated_at: note.updated_at,
     categories: note.categories
-      ? JSON.parse(`[${note.categories}]`).filter(c => c.id !== null)
-      : []
+      ? JSON.parse(`[${note.categories}]`).filter((c) => c.id !== null)
+      : [],
   }));
 
   const totalPages = Math.ceil(total / limit);
@@ -124,12 +124,9 @@ exports.getNotes = async (userId, query) => {
     limit,
     total,
     totalPages,
-    data
+    data,
   };
 };
-
-
-
 
 exports.getNoteById = async (userId, noteId) => {
   const sql = `
@@ -162,12 +159,9 @@ exports.getNoteById = async (userId, noteId) => {
 
   return {
     ...note,
-    categories: note.categories
-      ? JSON.parse(`[${note.categories}]`)
-      : []
+    categories: note.categories ? JSON.parse(`[${note.categories}]`) : [],
   };
 };
-
 
 exports.updateNote = async (userId, noteId, { title, content }) => {
   if (!title || !content) {

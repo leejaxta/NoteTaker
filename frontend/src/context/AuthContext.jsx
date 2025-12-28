@@ -11,8 +11,6 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     await loginApi(credentials);
     const res = await getMeApi();
-    console.log("From aurh", res);
-
     setUser(res);
   };
 
