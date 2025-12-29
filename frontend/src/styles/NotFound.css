@@ -8,12 +8,12 @@
 }
 
 .notfound-card {
-  background-color: #ffffff;
-  border: 1px solid #e5e5e5;
+  background: #fff;
+  border: 1px solid  #121212;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   border-radius: 8px;
   padding: 40px 30px;
   text-align: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
   max-width: 400px;
   width: 100%;
 }

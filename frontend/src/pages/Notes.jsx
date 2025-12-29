@@ -13,6 +13,8 @@ import Button from "../components/common/Button";
 import CategorySidebar from "../components/common/CategorySidebar";
 import Modal from "../components/common/Modal";
 import Toast from "../components/common/Toast";
+import { categoryExists } from "../utils/category";
+import { stripHtmlAndTruncate } from "../utils/text";
 
 const Notes = () => {
   const { user, logout } = useContext(AuthContext);
@@ -90,14 +92,11 @@ const Notes = () => {
 
   const handleAddCategory = async () => {
     if (!newCategoryName.trim()) return;
-    if (
-      categories.find(
-        (c) => c.name.toLowerCase() === newCategoryName.toLowerCase()
-      )
-    ) {
+    if (categoryExists(categories, newCategoryName)) {
       setToast({ message: "Category already exists!", type: "error" });
       return;
     }
+    
     await createCategory({ name: newCategoryName.trim() });
     setNewCategoryName("");
     setAddCategoryModalOpen(false);
@@ -245,9 +244,7 @@ const Notes = () => {
             ) : (
               <div className="notes-grid">
                 {notes.map((note) => {
-                  const excerpt = note.content
-                    .replace(/<[^>]*>/g, "")
-                    .substring(0, 150);
+                const excerpt = stripHtmlAndTruncate(note.content, 150);
 
                   return (
                     <div

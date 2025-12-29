@@ -11,6 +11,7 @@ import {
 import { FiEdit, FiTrash2, FiX, FiCheck, FiTag } from "react-icons/fi";
 import Toast from "./Toast";
 import "../../styles/CategoryManager.css";
+import { categoryExists } from "../../utils/category";
 
 const CategoryManager = ({ selectedCategories, setSelectedCategories }) => {
   const [categories, setCategories] = useState([]);
@@ -35,11 +36,7 @@ const CategoryManager = ({ selectedCategories, setSelectedCategories }) => {
 
   const handleAddCategory = async () => {
     if (!newCategoryName.trim()) return;
-    if (
-      categories.find(
-        (c) => c.name.toLowerCase() === newCategoryName.toLowerCase()
-      )
-    ) {
+    if (categoryExists(categories, newCategoryName)) {
       setToast({ message: "Category already exists!", type: "error" });
       return;
     }
@@ -55,11 +52,9 @@ const CategoryManager = ({ selectedCategories, setSelectedCategories }) => {
 
   const handleUpdateCategory = async () => {
     if (!editCategoryName.trim()) return;
-    if (
-      categories.find(
-        (c) => c.name.toLowerCase() === editCategoryName.toLowerCase()
-      )
-    ) {
+
+    if (categoryExists(categories, editCategoryName)) {
+
       setToast({ message: "Category already exists!", type: "error" });
       return;
     }

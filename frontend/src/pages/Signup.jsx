@@ -51,7 +51,6 @@ const Signup = () => {
   return (
     <div className="signup-page">
       <div className="signup-container">
-        {/* Header */}
         <div className="signup-header">
           <div className="login-logo">
             <img src="note_taker.png" alt="Logo" className="app-logo" />
@@ -60,7 +59,6 @@ const Signup = () => {
           <p className="app-subtitle">Create your account to get started</p>
         </div>
 
-        {/* Card */}
         <div className="signup-card">
           <div className="card-header">
             <h2 className="card-title">Create account</h2>
